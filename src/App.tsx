@@ -1,16 +1,17 @@
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 
-import LeftPanel from "./components/layout/LeftPanel";
 import Setting from "./components/setting/Setting";
+import Home from "./components/home/Home";
+import LeftPanel from "./components/layout/LeftPanel";
 
 export default function App() {
   return (
     <MemoryRouter>
       <div className="flex h-full">
         <LeftPanel />
-        <div className="flex-1 bg-blue-200">
+        <div className="flex-1">
           <Routes>
-            <Route path="/" element={<div>Home</div>} />
+            <Route path="/" element={<Home />} />
             <Route path="/setting" element={<Setting />} />
           </Routes>
         </div>
