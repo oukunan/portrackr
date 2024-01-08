@@ -1,17 +1,17 @@
-use std::process::{Command, Stdio};
 use serde::Serialize;
+use std::process::{Command, Stdio};
 
 #[derive(Debug, Serialize)]
 struct ListeningProcess {
     pid: String,
     name: String,
-    address: String,
+    port: String,
 }
 
 #[tauri::command]
 fn get_listening_processes() -> String {
     let lsof_output = Command::new("lsof")
-        .arg("-n")
+        .arg("-P")
         .arg("-i")
         .arg("@localhost")
         .stdout(Stdio::piped())
@@ -34,21 +34,36 @@ fn get_listening_processes() -> String {
         .map(|&line| {
             let fields: Vec<&str> = line.split_whitespace().collect();
             ListeningProcess {
-                pid: fields[1].to_string(),
                 name: fields[0].to_string(),
-                address: fields[8].to_string(),
+                pid: fields[1].to_string(),
+                port: fields[8].to_string().replace("localhost:", ""),
             }
         })
         .collect();
 
     // Serialize the vector to a JSON string
-    let json_output = serde_json::to_string(&listening_processes).expect("Failed to serialize data");
+    let json_output =
+        serde_json::to_string(&listening_processes).expect("Failed to serialize data");
 
     json_output
 }
+
+#[tauri::command]
+fn terminate_process_by_id(pid: u32) -> Result<(), String> {
+    let result = Command::new("kill").arg(&pid.to_string()).spawn();
+
+    match result {
+        Ok(_) => Ok(()),
+        Err(err) => Err(format!("Failed to terminate process {}: {}", pid, err)),
+    }
+}
+
 fn main() {
     tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![get_listening_processes])
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+        .invoke_handler(tauri::generate_handler![
+            get_listening_processes,
+            terminate_process_by_id
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
