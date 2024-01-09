@@ -2,6 +2,8 @@ import { invoke } from "@tauri-apps/api";
 import { useEffect, useState } from "react";
 import { TrashIcon } from "@radix-ui/react-icons";
 
+import { Input } from "../../@/components/ui/input"
+
 import {
   Table,
   TableBody,
@@ -92,7 +94,7 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-        <input className="bg-red" placeholder="Filter process" />
+        <Input type="text" placeholder="Filter process" />
       </div>
       <Table>
         <TableHeader>
