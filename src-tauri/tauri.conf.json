@@ -36,10 +36,10 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "processcontrol",
+        "title": "",
         "width": 800,
         "height": 600,
-        "decorations": false
+        "titleBarStyle": "overlay"
       }
     ]
   }
