@@ -113,8 +113,10 @@ export default function Home() {
 
       <div className="relative h-full">
         {/* Header */}
-        <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center justify-between bg-[#1C1D26] border-[#242531] border-t-[1px] border-b-[1px]">
-          <div>Process Name</div>
+        <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center bg-[#1C1D26] border-[#242531] border-t-[1px] border-b-[1px]">
+          <div className="w-[300px] max-w-[300px] mr-8 flex-1">
+            Process Name
+          </div>
           <div>Port</div>
           <div></div>
         </div>
@@ -130,15 +132,14 @@ export default function Home() {
           {filteredProcessList.map((p, index) => (
             <div
               key={index}
-              className={cn(
-                "px-6 py-2 flex items-center justify-between rounded-md",
-                {
-                  "bg-[#232531]": index % 2 === 0,
-                }
-              )}
+              className={cn("px-6 py-2 flex items-center rounded-md", {
+                "bg-[#232531]": index % 2 === 0,
+              })}
             >
-              <div>{p.name}</div>
-              <div className="font-bold">{p.port}</div>
+              <div className="w-[300px] max-w-[300px] truncate mr-8">
+                {p.name}
+              </div>
+              <div className="font-bold flex-1">{p.port}</div>
               <div>
                 <div onClick={() => setProcessIdToTerminate(p.pid)}>
                   <TrashIcon />
