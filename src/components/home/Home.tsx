@@ -114,7 +114,7 @@ export default function Home() {
       <div className="relative h-full">
         {/* Header */}
         <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center bg-[#1C1D26] border-[#242531] border-t-[1px] border-b-[1px]">
-          <div className="w-[300px] max-w-[300px] mr-8 flex-1">
+          <div className="w-[300px] max-w-[300px] mr-8 flex-1 border-r-[1px] border-[#292a38]">
             Process Name
           </div>
           <div>Port</div>
@@ -133,7 +133,7 @@ export default function Home() {
             <div
               key={index}
               className={cn("px-6 py-2 flex items-center rounded-md", {
-                "bg-[#232531]": index % 2 === 0,
+                "bg-[#20222d]": index % 2 === 0,
               })}
             >
               <div className="w-[300px] max-w-[300px] truncate mr-8">
@@ -141,9 +141,12 @@ export default function Home() {
               </div>
               <div className="font-bold flex-1">{p.port}</div>
               <div>
-                <div onClick={() => setProcessIdToTerminate(p.pid)}>
+                <button
+                  className="flex justify-center items-center p-1.5 rounded-md hover:bg-[#363a4d]"
+                  onClick={() => setProcessIdToTerminate(p.pid)}
+                >
                   <TrashIcon />
-                </div>
+                </button>
               </div>
             </div>
           ))}
