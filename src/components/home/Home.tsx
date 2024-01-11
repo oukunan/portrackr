@@ -5,15 +5,6 @@ import { TrashIcon } from "@radix-ui/react-icons";
 import { Input } from "../../@/components/ui/input";
 
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../@/components/ui/table";
-
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -90,8 +81,8 @@ export default function Home() {
   );
 
   return (
-    <div className="h-full bg-[#1C1D26] text-white">
-      <div className="px-6 pt-6 flex gap-4 justify-between items-center">
+    <div className="h-full bg-[#1C1D26] overflow-y-hidden text-white flex flex-col py-8">
+      <div className="px-6 mb-3 flex gap-4 justify-between items-center">
         <div className="flex gap-4 items-center">
           <div>Auto Refresh</div>
           <Select
@@ -120,48 +111,55 @@ export default function Home() {
         />
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow className="border-[#242531]">
-            <TableHead>Process Name</TableHead>
-            <TableHead>Port</TableHead>
-            <TableHead></TableHead>
-          </TableRow>
-        </TableHeader>
-        <div className="h-[8px]" />
-        <TableBody>
+      <div className="relative h-full">
+        {/* Header */}
+        <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center justify-between bg-[#1C1D26] border-[#242531] border-t-[1px] border-b-[1px]">
+          <div>Process Name</div>
+          <div>Port</div>
+          <div></div>
+        </div>
+        {/* List container */}
+        <div className="pt-[48px] px-4 overflow-y-auto h-[calc(100%-36px)]">
           {localProcessList.length === 0 &&
             !isFilterMode &&
             "No localhost process running..."}
-            {isFilterMode && filteredProcessList.length === 0 && "Search result not found  "}
+
+          {isFilterMode &&
+            filteredProcessList.length === 0 &&
+            "Search result not found "}
           {filteredProcessList.map((p, index) => (
-            <TableRow
-              key={p.pid}
-              className={cn({ "bg-[#232531]": index % 2 === 0 })}
+            <div
+              key={index}
+              className={cn(
+                "px-6 py-2 flex items-center justify-between rounded-md",
+                {
+                  "bg-[#232531]": index % 2 === 0,
+                }
+              )}
             >
-              <TableCell className="rounded-l-lg">{p.name}</TableCell>
-              <TableCell className="font-bold">{p.port}</TableCell>
-              <TableCell className="rounded-r-lg">
+              <div>{p.name}</div>
+              <div className="font-bold">{p.port}</div>
+              <div>
                 <div onClick={() => setProcessIdToTerminate(p.pid)}>
                   <TrashIcon />
                 </div>
-              </TableCell>
-            </TableRow>
+              </div>
+            </div>
           ))}
-        </TableBody>
-      </Table>
+        </div>
 
-      {processToTerminated && (
-        <TerminateProcessDialog
-          open={!!processIdToTerminate && enabledTerminatedWarningDialog}
-          selectedProcess={processToTerminated}
-          onOpenChange={(open) => {
-            if (!open) {
-              setProcessIdToTerminate(null);
-            }
-          }}
-        />
-      )}
+        {processToTerminated && (
+          <TerminateProcessDialog
+            open={!!processIdToTerminate && enabledTerminatedWarningDialog}
+            selectedProcess={processToTerminated}
+            onOpenChange={(open) => {
+              if (!open) {
+                setProcessIdToTerminate(null);
+              }
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }
