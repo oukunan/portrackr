@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 
-export default function useLocalStorage<T>(key: string, defaultValue: T) {
+export default function useLocalStorage<T>(
+  key: string,
+  defaultValue: T
+): [T, React.Dispatch<T>] {
   const [value, setValue] = useState(() => {
     try {
       const currentValue = JSON.parse(
-        localStorage.getItem(key) || String(defaultValue)
+        localStorage.getItem(key) ?? String(defaultValue)
       );
 
       return currentValue;

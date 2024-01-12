@@ -12,7 +12,7 @@ import {
 } from "../../../@/components/ui/alert-dialog";
 
 import { LocalProcess } from "../../../components/home/Home";
-import { Checkbox } from "@radix-ui/react-checkbox";
+import { endProcessById } from "../../../api";
 
 type Props = {
   selectedProcess: LocalProcess;
@@ -23,15 +23,28 @@ type Props = {
 export default function TerminateProcessDialog(props: Props) {
   const { pid, port } = props.selectedProcess;
 
+  const handleEndProcess = async (pid: string) => {
+    try {
+      await endProcessById(pid);
+      console.log("Success");
+    } catch (err) {
+      console.log("e: ", err);
+    }
+  };
+
   return (
     <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This will terminate process {pid} with port number {port}
-            <div className="items-top flex space-x-2">
-              <Checkbox id="terms1" />
+          <AlertDialogDescription className="flex flex-col gap-4">
+            This action will end process with port number {port}
+            <div className="items-center flex space-x-2">
+              <input
+                type="checkbox"
+                id="terms1"
+                className="w-4 h-4 border-[1px] border-black rounded-sm"
+              />
               <div className="grid gap-1.5 leading-none">
                 <label
                   htmlFor="terms1"
@@ -45,19 +58,7 @@ export default function TerminateProcessDialog(props: Props) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => {
-              invoke("terminate_process_by_id", {
-                pid: Number(pid),
-              })
-                .then(() => {
-                  console.log("Success");
-                })
-                .catch((e) => {
-                  console.log("e: ", e);
-                });
-            }}
-          >
+          <AlertDialogAction onClick={() => handleEndProcess(pid)}>
             Terminate
           </AlertDialogAction>
         </AlertDialogFooter>

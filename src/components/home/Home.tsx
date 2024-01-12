@@ -1,4 +1,3 @@
-import { invoke } from "@tauri-apps/api";
 import { useEffect, useMemo, useState } from "react";
 import { TrashIcon } from "@radix-ui/react-icons";
 
@@ -12,9 +11,17 @@ import {
   SelectValue,
 } from "../../@/components/ui/select";
 
-import useLocalStorage from "../../@/hooks/useLocalStorage";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../@/components/ui/tooltip";
+
 import TerminateProcessDialog from "../../@/components/compose/TerminateProcessDialog";
 import { cn, convertMSTime } from "../../@/lib/utils";
+import SettingsButtonPopover from "../../@/components/compose/settings/SettingsButtonPopover";
+import { endProcessById, getRunningLocalhostProcesses } from "../../api";
+import { useSettings } from "../setting";
 
 export type LocalProcess = {
   pid: string;
@@ -36,10 +43,9 @@ export default function Home() {
     string | null
   >(null);
 
-  const [enabledTerminatedWarningDialog] = useLocalStorage(
-    "enabled-terminate-warning-dialog",
-    true
-  );
+  const {
+    enableTerminateProcessWarning: [enableTerminateProcessWarning],
+  } = useSettings();
 
   const [query, setQuery] = useState<string>("");
 
@@ -62,7 +68,7 @@ export default function Home() {
 
     if (autoRefreshDuration) {
       id = setInterval(() => {
-        invoke("get_listening_processes").then((deserializedData) => {
+        getRunningLocalhostProcesses().then((deserializedData) => {
           const result = JSON.parse(deserializedData as string);
           setLocalProcessList(result);
         });
@@ -82,12 +88,12 @@ export default function Home() {
 
   return (
     <div className="h-full bg-[#1C1D26] overflow-y-hidden text-white flex flex-col py-8">
-      <div className="px-6 mb-3 flex gap-4 justify-between items-center">
+      <div className="pl-6 pr-8 mb-3 flex gap-4 justify-between items-center">
         <div className="flex gap-4 items-center">
           <div>Auto Refresh</div>
           <Select
-            onValueChange={(updatedDuration) =>
-              setAutoRefreshDuration(Number(updatedDuration))
+            onValueChange={(duration) =>
+              setAutoRefreshDuration(Number(duration))
             }
           >
             <SelectTrigger className="w-[150px]">
@@ -102,13 +108,17 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-        <Input
-          type="text"
-          placeholder="Filter process"
-          className="w-[200px]"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+        <div className="flex gap-2 items-center">
+          <SettingsButtonPopover />
+
+          <Input
+            type="text"
+            placeholder="Filter process"
+            className="w-[200px]"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="relative h-full">
@@ -121,7 +131,7 @@ export default function Home() {
           <div></div>
         </div>
         {/* List container */}
-        <div className="pt-[48px] px-4 overflow-y-auto h-[calc(100%-36px)]">
+        <div className="pt-[48px] pl-4 pr-8 overflow-y-auto h-[calc(100%-36px)]">
           {localProcessList.length === 0 &&
             !isFilterMode &&
             "No localhost process running..."}
@@ -141,12 +151,23 @@ export default function Home() {
               </div>
               <div className="font-bold flex-1">{p.port}</div>
               <div>
-                <button
-                  className="flex justify-center items-center p-1.5 rounded-md hover:bg-[#363a4d]"
-                  onClick={() => setProcessIdToTerminate(p.pid)}
-                >
-                  <TrashIcon />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <button
+                      className="p-1.5 rounded-md hover:bg-[#363a4d]"
+                      onClick={() => {
+                        if (!enableTerminateProcessWarning) {
+                          endProcessById(p.pid);
+                        } else {
+                          setProcessIdToTerminate(p.pid);
+                        }
+                      }}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>End process</TooltipContent>
+                </Tooltip>
               </div>
             </div>
           ))}
@@ -154,7 +175,7 @@ export default function Home() {
 
         {processToTerminated && (
           <TerminateProcessDialog
-            open={!!processIdToTerminate && enabledTerminatedWarningDialog}
+            open={!!(processIdToTerminate && enableTerminateProcessWarning)}
             selectedProcess={processToTerminated}
             onOpenChange={(open) => {
               if (!open) {
