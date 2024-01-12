@@ -109,8 +109,6 @@ export default function Home() {
           </Select>
         </div>
         <div className="flex gap-2 items-center">
-          <SettingsButtonPopover />
-
           <Input
             type="text"
             placeholder="Filter process"
@@ -118,6 +116,7 @@ export default function Home() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
+          <SettingsButtonPopover />
         </div>
       </div>
 

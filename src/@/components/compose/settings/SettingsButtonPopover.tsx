@@ -1,4 +1,4 @@
-import { GearIcon } from "@radix-ui/react-icons";
+import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 
@@ -7,24 +7,22 @@ import SettingContent from "./SettingsContent";
 
 export default function SettingsButtonPopover() {
   return (
-    <div>
-      <Popover>
-        <Tooltip>
-          <PopoverContent className="w-[400px]">
-            <SettingContent />
-          </PopoverContent>
+    <Popover>
+      <Tooltip>
+        <PopoverContent className="w-[300px]" align="end">
+          <SettingContent />
+        </PopoverContent>
 
-          <TooltipTrigger>
-            <PopoverTrigger>
-              <button className="p-1.5 rounded-md hover:bg-[#363a4d]">
-                <GearIcon />
-              </button>
-            </PopoverTrigger>
-          </TooltipTrigger>
+        <TooltipTrigger>
+          <PopoverTrigger>
+            <button className="p-1.5 rounded-md hover:bg-[#363a4d]">
+              <MixerHorizontalIcon width={17} height={17} />
+            </button>
+          </PopoverTrigger>
+        </TooltipTrigger>
 
-          <TooltipContent>Settings</TooltipContent>
-        </Tooltip>
-      </Popover>
-    </div>
+        <TooltipContent>Settings</TooltipContent>
+      </Tooltip>
+    </Popover>
   );
 }
