@@ -9,7 +9,7 @@ export default function SettingContent() {
   } = useSettings();
 
   return (
-    <div className="items-start flex space-x-2">
+    <div className="items-center flex space-x-2">
       <input
         type="checkbox"
         id="terminateProcessWarningDialog"
