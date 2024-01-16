@@ -1,11 +1,23 @@
 use serde::Serialize;
 use std::process::{Command, Stdio};
+use serde_json;
+
 
 #[derive(Debug, Serialize)]
 struct ListeningProcess {
     pid: String,
     name: String,
     port: String,
+}
+
+#[derive(Serialize)]
+struct ProcessInfo {
+    pcpu: String,
+    stime: String,
+    vsz: String,
+    comm: String,
+    gid: String,
+    time: String,
 }
 
 #[tauri::command]
@@ -58,11 +70,49 @@ fn terminate_process_by_id(pid: u32) -> Result<(), String> {
     }
 }
 
+#[tauri::command]
+fn get_process_info_by_id(pid: u32) -> String {
+    // Build the command
+    let output = Command::new("ps")
+        .args(&["-p", &pid.to_string(), "-o", "pcpu,stime,vsz=MEMORY,comm,gid,time"])
+        .output()
+        .expect("Failed to execute command");
+
+    // Check if the command was successful
+    if !output.status.success() {
+        return format!("Failed to execute command: {:?}", output);
+    }
+
+    // Convert the output to a string
+    let output_str = String::from_utf8_lossy(&output.stdout);
+
+    // Parse the output and create a ProcessInfo struct
+    let mut lines = output_str.lines();
+    if let Some(data_line) = lines.nth(1) {
+        let data_parts: Vec<&str> = data_line.split_whitespace().collect();
+        let process_info = ProcessInfo {
+            pcpu: data_parts[0].to_string(),
+            stime: data_parts[1].to_string(),
+            vsz: data_parts[2].to_string(),
+            comm: data_parts[3].to_string(),
+            gid: data_parts[4].to_string(),
+            time: data_parts[5].to_string(),
+        };
+
+        // Serialize the struct to JSON and return as String
+        serde_json::to_string(&process_info).expect("Failed to serialize JSON")
+    } else {
+        "Invalid output format".to_string()
+    }
+}
+
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             get_listening_processes,
-            terminate_process_by_id
+            terminate_process_by_id,
+            get_process_info_by_id
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
