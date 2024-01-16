@@ -1,8 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  TrashIcon,
-  InfoCircledIcon,
-} from "@radix-ui/react-icons";
 
 import { Input } from "../../@/components/ui/input";
 
@@ -14,20 +10,15 @@ import {
   SelectValue,
 } from "../../@/components/ui/select";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "../../@/components/ui/tooltip";
-
 import TerminateProcessDialog from "../../@/components/compose/TerminateProcessDialog";
-import { cn, convertMSTime } from "../../@/lib/utils";
+import { convertMSTime } from "../../@/lib/utils";
 import SettingsButtonPopover from "../../@/components/compose/settings/SettingsButtonPopover";
 import { endProcessById, getRunningLocalhostProcesses } from "../../api";
 import { useSettings } from "../setting";
 
 import ProcessInfoSheet from "../../@/components/compose/ProcessInfoSheet";
 import ProcessInfoButton from "../../@/components/compose/process-info/ProcessInfoButton";
+import ProcessTableRow from "../../@/components/compose/process-table-row/ProcessTableRow";
 
 export type LocalProcess = {
   pid: string;
@@ -102,7 +93,7 @@ export default function Home() {
 
   return (
     <div className="h-full bg-[#1C1D26] overflow-y-hidden text-white flex flex-col py-8">
-      <div className="pl-6 pr-8 mb-3 flex gap-4 justify-between items-center">
+      <div className="pl-6 pr-8 pb-4 flex gap-4 justify-between items-center border-[#242531] border-b-[1px]">
         <div className="flex gap-4 items-center">
           <div>Auto Refresh</div>
           <Select
@@ -141,15 +132,15 @@ export default function Home() {
       <div className="h-full flex">
         <div className="relative h-full flex-1">
           {/* Header */}
-          <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center bg-[#1C1D26] border-[#242531] border-t-[1px] border-b-[1px]">
+          <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center bg-[#1C1D26] border-[#242531] border-b-[1px]">
             <div className="w-[300px] max-w-[300px] mr-8 flex-1 border-r-[1px] border-[#292a38]">
               Process Name
             </div>
             <div>Port</div>
-            <div></div>
+            <div />
           </div>
           {/* List container */}
-          <div className="pt-[48px] pl-4 pr-8 overflow-y-auto h-[calc(100%-36px)]">
+          <div className="pt-[48px] pl-4 pr-8 overflow-y-auto h-[calc(100%-28px)]">
             {localProcessList.length === 0 &&
               !isFilterMode &&
               "No localhost process running..."}
@@ -157,51 +148,30 @@ export default function Home() {
             {isFilterMode &&
               filteredProcessList.length === 0 &&
               "Search result not found "}
+
             {filteredProcessList.map((p, index) => (
-              <div
+              <ProcessTableRow
                 key={index}
-                className={cn("px-6 py-2 flex items-center rounded-md", {
-                  "bg-[#20222d]": index % 2 === 0,
-                })}
-              >
-                <div className="w-[300px] max-w-[300px] truncate mr-8">
-                  {p.name}
-                </div>
-                <div className="font-bold flex-1">{p.port}</div>
-                <div>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        className="p-1.5 rounded-md hover:bg-[#363a4d]"
-                        onClick={() => {
-                          setProcessInfoSidebarVisible(true)
-                          setProcessInfoId(p.pid);
-                        }}
-                      >
-                        <InfoCircledIcon />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>View Info</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        className="p-1.5 rounded-md hover:bg-[#363a4d]"
-                        onClick={() => {
-                          if (!enableTerminateProcessWarning) {
-                            endProcessById(p.pid);
-                          } else {
-                            setProcessIdToTerminate(p.pid);
-                          }
-                        }}
-                      >
-                        <TrashIcon />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>End process</TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
+                process={p}
+                onInfoButtonClick={(pid: string) => {
+                  if (processInfoId === p.pid) {
+                    setProcessInfoSidebarVisible(false);
+                    setProcessInfoId("");
+                  } else {
+                    setProcessInfoSidebarVisible(true);
+                    setProcessInfoId(pid);
+                  }
+                }}
+                onEnterProcessButtonClick={(pid: string) => {
+                  if (!enableTerminateProcessWarning) {
+                    endProcessById(p.pid);
+                  } else {
+                    setProcessIdToTerminate(pid);
+                  }
+                }}
+                isEvenChild={index % 2 === 0}
+                isInfoSelected={p.pid === processInfoId}
+              />
             ))}
           </div>
         </div>

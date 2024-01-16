@@ -10,7 +10,7 @@ export default React.memo(function ProcessInfoButton(props: {
 }) {
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger asChild>
         <button
           className={cn("p-1.5 rounded-md hover:bg-[#363a4d]", {
             "bg-[#363a4d]": props.active,

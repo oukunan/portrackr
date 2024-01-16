@@ -1,0 +1,54 @@
+import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
+import { cn } from "../../../lib/utils";
+import { LocalProcess } from "../../../../components/home/Home";
+
+type Props = {
+  process: LocalProcess;
+  onInfoButtonClick: (pid: string) => void;
+  onEnterProcessButtonClick: (pid: string) => void;
+  isInfoSelected?: boolean;
+  isEvenChild: boolean;
+};
+
+export default function ProcessTableRow(props: Props) {
+  return (
+    <div
+      className={cn("px-6 py-2 flex items-center rounded-md border-[1px] border-transparent", {
+        "bg-[#20222d]": props.isEvenChild,
+        "border-blue-600 bg-[#2f3a9b2c]": props.isInfoSelected,
+      })}
+    >
+      <div className="w-[300px] max-w-[300px] truncate mr-8">
+        {props.process.name}
+      </div>
+      <div className="font-bold flex-1">{props.process.port}</div>
+      <div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className="p-1.5 rounded-md hover:bg-[#363a4d]"
+              onClick={() => {
+                props.onInfoButtonClick(props.process.pid);
+              }}
+            >
+              <InfoCircledIcon />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>View Info</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className="p-1.5 rounded-md hover:bg-[#363a4d]"
+              onClick={() => props.onEnterProcessButtonClick(props.process.pid)}
+            >
+              <TrashIcon />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>End process</TooltipContent>
+        </Tooltip>
+      </div>
+    </div>
+  );
+}
