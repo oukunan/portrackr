@@ -124,7 +124,13 @@ export default function Home() {
           <SettingsButtonPopover />
           <ProcessInfoButton
             active={processInfoSidebarVisible}
-            onClick={() => setProcessInfoSidebarVisible((v) => !v)}
+            onClick={() => {
+              if (processInfoId && processInfoSidebarVisible) {
+                setProcessInfoId("");
+              }
+
+              setProcessInfoSidebarVisible((v) => !v);
+            }}
           />
         </div>
       </div>
@@ -136,8 +142,8 @@ export default function Home() {
             <div className="w-[300px] max-w-[300px] mr-8 flex-1 border-r-[1px] border-[#292a38]">
               Process Name
             </div>
-            <div>Port</div>
-            <div />
+            <div className="flex-1 ">Port</div>
+            <div className="border-r-[1px] border-[#292a38]"></div>
           </div>
           {/* List container */}
           <div className="pt-[48px] pl-4 pr-8 overflow-y-auto h-[calc(100%-28px)]">

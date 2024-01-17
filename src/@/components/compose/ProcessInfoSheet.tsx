@@ -2,12 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getProcessInfoById } from "../../../api";
 import React from "react";
-
-type Props = {
-  pId: string;
-  pName: string | undefined;
-  pPort: string | undefined;
-};
+import { cn } from "../../lib/utils";
 
 type ProcessInfo = {
   comm: string;
@@ -18,50 +13,73 @@ type ProcessInfo = {
   vsz: string;
 };
 
+type Props = {
+  pId: string;
+  pName: string | undefined;
+  pPort: string | undefined;
+};
+
+
 export default React.memo(function ProcessInfoSheet(props: Props) {
   const [processInfo, setProcessInfo] = useState<ProcessInfo | null>(null);
 
   useEffect(() => {
+    let id: NodeJS.Timeout | null = null;
+
+    setProcessInfo(null);
+
     if (props.pId) {
-      getProcessInfoById(props.pId).then((data: string) => {
-        setProcessInfo(JSON.parse(data) as ProcessInfo);
-      });
+      id = setInterval(() => {
+        getProcessInfoById(props.pId).then((data: string) => {
+          setProcessInfo(JSON.parse(data) as ProcessInfo);
+        });
+      }, 1000);
     }
+
+    return () => {
+      if (id) {
+        clearInterval(id);
+      }
+    };
   }, [props.pId]);
 
   const value = useMemo(
     () => ({
-      name: props.pName,
-      pid: props.pId,
-      port: props.pPort,
-      gid: processInfo?.gid,
-      stime: processInfo?.stime,
-      time: processInfo?.time,
-      pcup: processInfo?.pcpu,
-      vsz: processInfo?.vsz,
-      cmd: processInfo?.comm,
+      PID: props.pId,
+      Name: props.pName,
+      Port: props.pPort,
+      // "Effective Group ID": processInfo?.gid,
+      "Start Time": processInfo?.stime,
+      "CPU time": processInfo?.time,
+      "Ratio of CPU time used to CPU time": processInfo?.pcpu,
+      "Amount of (virtual) memory": `${processInfo?.vsz} kilobytes`,
+      Command: processInfo?.comm,
     }),
     [props.pName, props.pId, props.pPort, processInfo]
   );
 
   const renderContent = () => {
     if (props.pId) {
-      return Object.entries(value).map(([key, value]) => {
-        return (
-          <div key={key} className="flex flex-col justify-between">
-            <span>{key}</span>
-            <span>{value}</span>
-          </div>
-        );
-      });
+      return Object.entries(value).map(([key, value]) => (
+        <div key={key} className="flex gap-1 flex-col justify-between">
+          <span className="text-gray-400">{key}</span>
+          <span
+            className={cn({ "h-[18px] bg-[#1C1D26] rounded-md": !processInfo })}
+          >
+            {processInfo ? value : ""}
+          </span>
+        </div>
+      ));
     } else {
-      return 'Nothing here'
+      return "Nothing here";
     }
   };
 
   return (
-    <div className="w-[300px] pt-[50px] px-6">
-      <div className="flex flex-col gap-2">{renderContent()}</div>
+    <div className="text-sm w-[320px] pt-[50px] px-6">
+      <div className="flex flex-col gap-4 bg-[#20222d] px-6 py-7 rounded-md">
+        {renderContent()}
+      </div>
     </div>
   );
 });
