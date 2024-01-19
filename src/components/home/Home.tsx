@@ -26,15 +26,8 @@ export type LocalProcess = {
   port: string;
 };
 
-const AUTO_REFRESH_DURATIONS = [
-  1000, 2000, 4000, 6000, 8000, 10000, 20000, 30000,
-];
-
 export default function Home() {
   const [localProcessList, setLocalProcessList] = useState<LocalProcess[]>([]);
-  const [autoRefreshDuration, setAutoRefreshDuration] = useState<number | null>(
-    1000
-  );
 
   const [processInfoId, setProcessInfoId] = useState("");
   const [processIdToTerminate, setProcessIdToTerminate] = useState<
@@ -50,6 +43,15 @@ export default function Home() {
 
   const [query, setQuery] = useState<string>("");
 
+  useEffect(() => {
+    setInterval(() => {
+      getRunningLocalhostProcesses().then((serializedData: string) => {
+        const result = JSON.parse(serializedData);
+        setLocalProcessList(result);
+      });
+    }, 1000);
+  }, []);
+
   const isFilterMode = query.length > 1;
 
   const filteredProcessList = useMemo(() => {
@@ -64,25 +66,6 @@ export default function Home() {
     });
   }, [localProcessList, query]);
 
-  useEffect(() => {
-    let id: NodeJS.Timeout | null;
-
-    if (autoRefreshDuration) {
-      id = setInterval(() => {
-        getRunningLocalhostProcesses().then((deserializedData) => {
-          const result = JSON.parse(deserializedData as string);
-          setLocalProcessList(result);
-        });
-      }, autoRefreshDuration);
-    }
-
-    return () => {
-      if (id) {
-        clearInterval(id);
-      }
-    };
-  }, [autoRefreshDuration]);
-
   const processToTerminated = localProcessList.find(
     (p) => p.pid === processIdToTerminate
   );
@@ -94,33 +77,14 @@ export default function Home() {
   return (
     <div className="h-full bg-[#1C1D26] overflow-y-hidden text-white flex flex-col py-8">
       <div className="pl-6 pr-8 pb-4 flex gap-4 justify-between items-center border-[#242531] border-b-[1px]">
-        <div className="flex gap-4 items-center">
-          <div>Auto Refresh</div>
-          <Select
-            onValueChange={(duration) =>
-              setAutoRefreshDuration(Number(duration))
-            }
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="1 second" />
-            </SelectTrigger>
-            <SelectContent>
-              {AUTO_REFRESH_DURATIONS.map((duration) => (
-                <SelectItem key={duration} value={String(duration)}>
-                  {convertMSTime(duration)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Input
+          type="text"
+          placeholder="Filter process"
+          className="w-[200px]"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
         <div className="flex gap-2 items-center">
-          <Input
-            type="text"
-            placeholder="Filter process"
-            className="w-[200px]"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
           <SettingsButtonPopover />
           <ProcessInfoButton
             active={processInfoSidebarVisible}
