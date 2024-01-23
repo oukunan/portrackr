@@ -9,13 +9,13 @@ export default function SettingsButtonPopover() {
   return (
     <Popover>
       <Tooltip>
-        <PopoverContent className="w-[300px]" align="end">
+        <PopoverContent className="w-[500px]" align="end">
           <SettingContent />
         </PopoverContent>
 
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
-            <button className="p-1.5 rounded-md hover:bg-[#363a4d]">
+            <button className="p-1.5 rounded-md hover:bg-main-background-3">
               <MixerHorizontalIcon width={17} height={17} />
             </button>
           </PopoverTrigger>

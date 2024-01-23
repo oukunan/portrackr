@@ -62,9 +62,9 @@ export default React.memo(function ProcessInfoSheet(props: Props) {
     if (props.pId) {
       return Object.entries(value).map(([key, value]) => (
         <div key={key} className="flex gap-1 flex-col justify-between">
-          <span className="text-gray-400">{key}</span>
+          <span className="font-bold text-accent-foreground">{key}</span>
           <span
-            className={cn({ "h-[18px] bg-[#1C1D26] rounded-md": !processInfo })}
+            className={cn({ "h-[18px] bg-main-background-3 rounded-md": !processInfo })}
           >
             {processInfo ? value : ""}
           </span>
@@ -77,7 +77,7 @@ export default React.memo(function ProcessInfoSheet(props: Props) {
 
   return (
     <div className="text-sm w-[320px] pt-[50px] px-6">
-      <div className="flex flex-col gap-4 bg-[#20222d] px-6 py-7 rounded-md">
+      <div className="flex flex-col gap-4 bg-main-background-2 px-6 py-7 rounded-md">
         {renderContent()}
       </div>
     </div>

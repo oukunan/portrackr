@@ -15,7 +15,7 @@ export default function ProcessTableRow(props: Props) {
   return (
     <div
       className={cn("px-6 py-2 flex items-center rounded-md border-[1px] border-transparent", {
-        "bg-[#20222d]": props.isEvenChild,
+        "bg-main-background-2": props.isEvenChild,
         "border-blue-600 bg-[#2f3a9b2c]": props.isInfoSelected,
       })}
     >
@@ -27,7 +27,7 @@ export default function ProcessTableRow(props: Props) {
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              className="p-1.5 rounded-md hover:bg-[#363a4d]"
+              className="p-1.5 rounded-md hover:bg-main-background-3"
               onClick={() => {
                 props.onInfoButtonClick(props.process.pid);
               }}
@@ -40,7 +40,7 @@ export default function ProcessTableRow(props: Props) {
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              className="p-1.5 rounded-md hover:bg-[#363a4d]"
+              className="p-1.5 rounded-md hover:bg-main-background-3"
               onClick={() => props.onEnterProcessButtonClick(props.process.pid)}
             >
               <TrashIcon />

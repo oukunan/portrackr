@@ -56,7 +56,7 @@ export default function FeedbackButtonPopover() {
   return (
     <div>
       <Popover>
-        <PopoverTrigger>
+        <PopoverTrigger asChild>
           <Button className="py-1 px-2.5 h-auto border-[1px] border-[#292a38] bg-transparent text-[#84859e]">
             Feedback
           </Button>

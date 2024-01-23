@@ -12,8 +12,8 @@ export default React.memo(function ProcessInfoButton(props: {
     <Tooltip>
       <TooltipTrigger asChild>
         <button
-          className={cn("p-1.5 rounded-md hover:bg-[#363a4d]", {
-            "bg-[#363a4d]": props.active,
+          className={cn("p-1.5 rounded-md hover:bg-main-background-3", {
+            "bg-main-background-3": props.active,
           })}
           onClick={props.onClick}
         >

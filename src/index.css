@@ -7,6 +7,18 @@
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
 
+    --left-panel-background: #fcfcfcca;
+
+    --component-background: #ebebeb;
+    --component-foreground: #0d0d0ddf;
+    --component-border-color: #dbdbdb;
+
+    --main-background: #eeebeb;
+    --main-background-2: #e4e2e2;
+    --main-background-3: #d3d2d2;
+
+    --main-foreground: #1C1D26;
+
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
 
@@ -39,6 +51,18 @@
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
 
+    --left-panel-background: #0b0c10cc;
+
+    --component-background: #252532;
+    --component-foreground: #dbd9d9;
+    --component-border-color: #2f2f2f;
+
+    --main-background: #1C1D26;
+    --main-background-2: #20222d;
+    --main-background-3: #303344;
+    
+    --main-foreground: #dddddd;
+
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
 
@@ -70,8 +94,11 @@
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  
+  html, body {
+    height: 100%;
+    overflow: hidden;
   }
 }
 

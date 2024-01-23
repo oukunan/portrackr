@@ -32,6 +32,7 @@
     "security": {
       "csp": null
     },
+    "macOSPrivateApi": true,
     "windows": [
       {
         "fullscreen": false,
@@ -39,7 +40,8 @@
         "title": "",
         "width": 1200,
         "height": 750,
-        "titleBarStyle": "Overlay"
+        "titleBarStyle": "Overlay",
+        "transparent": true
       }
     ]
   }

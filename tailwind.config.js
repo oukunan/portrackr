@@ -21,7 +21,23 @@ module.exports = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
+
+        'main-background': "var(--main-background)",
+        'main-background-2': 'var(--main-background-2)',
+        'main-background-3': 'var(--main-background-3)',
+
+        'main-foreground': "var(--main-foreground)",
+        'left-panel-background': "var(--left-panel-background)",
+
+        'component-background': "var(--component-background)",
+        'component-foreground': "var(--component-foreground)",
+        "component-border-color": "var(--component-border-color)",
+
+        "component-border-selected": "var(--component-border-selected)",
+        "component-background-selected": "var(--component-background-selected)",
+
+
+        background: "var(--background)",
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",

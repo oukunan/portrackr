@@ -23,7 +23,7 @@ export default function ThemeToggleVisual(props: ThemeToggleVisualProps) {
         className={cn(
           "relative border-[3px] border-transparent border-solid rounded-md w-[130px] h-[90px] mb-2",
           {
-            "bg-slate-800": props.theme === "dark",
+            "bg-slate-800 text-white": props.theme === "dark",
             "bg-slate-300": props.theme === "light" || props.theme === "system",
             "border-blue-500": theme === props.theme
           }
@@ -33,7 +33,7 @@ export default function ThemeToggleVisual(props: ThemeToggleVisualProps) {
           className={cn(
             "p-4 border-l-[1px] border-t-[1px] border-transparent border-solid w-[100px] h-[60px] absolute right-0 bottom-0 rounded-md",
             {
-              "bg-slate-700":
+              "bg-slate-700 text-white":
                 props.theme === "dark" || props.theme === "system",
               "bg-white text-gray-900": props.theme === "light",
             }

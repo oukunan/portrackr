@@ -1,7 +1,8 @@
 use serde::Serialize;
-use std::process::{Command, Stdio};
 use serde_json;
-
+use tauri::Manager;
+use std::process::{Command, Stdio};
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 #[derive(Debug, Serialize)]
 struct ListeningProcess {
@@ -74,7 +75,12 @@ fn terminate_process_by_id(pid: u32) -> Result<(), String> {
 fn get_process_info_by_id(pid: u32) -> String {
     // Build the command
     let output = Command::new("ps")
-        .args(&["-p", &pid.to_string(), "-o", "pcpu,stime,vsz=MEMORY,comm,gid,time"])
+        .args(&[
+            "-p",
+            &pid.to_string(),
+            "-o",
+            "pcpu,stime,vsz=MEMORY,comm,gid,time",
+        ])
         .output()
         .expect("Failed to execute command");
 
@@ -106,9 +112,16 @@ fn get_process_info_by_id(pid: u32) -> String {
     }
 }
 
-
 fn main() {
     tauri::Builder::default()
+        .setup(|app| {
+            let window = app.get_window("main").unwrap();
+
+            #[cfg(target_os = "macos")]
+            apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
+                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             get_listening_processes,
             terminate_process_by_id,

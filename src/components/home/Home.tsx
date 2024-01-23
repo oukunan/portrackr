@@ -2,16 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Input } from "../../@/components/ui/input";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../@/components/ui/select";
-
 import TerminateProcessDialog from "../../@/components/compose/TerminateProcessDialog";
-import { convertMSTime } from "../../@/lib/utils";
 import SettingsButtonPopover from "../../@/components/compose/settings/SettingsButtonPopover";
 import { endProcessById, getRunningLocalhostProcesses } from "../../api";
 import { useSettings } from "../setting";
@@ -75,8 +66,8 @@ export default function Home() {
   );
 
   return (
-    <div className="h-full bg-[#1C1D26] overflow-y-hidden text-white flex flex-col py-8">
-      <div className="pl-6 pr-8 pb-4 flex gap-4 justify-between items-center border-[#242531] border-b-[1px]">
+    <div className="h-full bg-main-background overflow-y-hidden text-main-foreground flex flex-col py-8">
+      <div className="pl-6 pr-8 pb-4 flex gap-4 justify-between items-center border-component-border-color border-b-[1px]">
         <Input
           type="text"
           placeholder="Filter process"
@@ -102,12 +93,12 @@ export default function Home() {
       <div className="h-full flex">
         <div className="relative h-full flex-1">
           {/* Header */}
-          <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center bg-[#1C1D26] border-[#242531] border-b-[1px]">
-            <div className="w-[300px] max-w-[300px] mr-8 flex-1 border-r-[1px] border-[#292a38]">
+        <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center border-component-border-color border-b-[1px]">
+            <div className="w-[300px] max-w-[300px] mr-8 flex-1 border-r-[1px] border-component-border-color">
               Process Name
             </div>
             <div className="flex-1 ">Port</div>
-            <div className="border-r-[1px] border-[#292a38]"></div>
+            <div className="border-r-[1px] border-component-border-color"></div>
           </div>
           {/* List container */}
           <div className="pt-[48px] pl-4 pr-8 overflow-y-auto h-[calc(100%-28px)]">
