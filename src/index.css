@@ -12,6 +12,8 @@
     --component-background: #ebebeb;
     --component-foreground: #0d0d0ddf;
     --component-border-color: #dbdbdb;
+    --component-border-selected: #3b82f6;
+    --component-background-selected: #3b83f621;
 
     --main-background: #eeebeb;
     --main-background-2: #e4e2e2;
@@ -56,6 +58,8 @@
     --component-background: #252532;
     --component-foreground: #dbd9d9;
     --component-border-color: #2f2f2f;
+    --component-border-selected: #2563eb;
+    --component-background-selected: #2f3a9b2c;
 
     --main-background: #1C1D26;
     --main-background-2: #20222d;

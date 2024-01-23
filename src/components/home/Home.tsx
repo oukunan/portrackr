@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Input } from "../../@/components/ui/input";
-
 import TerminateProcessDialog from "../../@/components/compose/TerminateProcessDialog";
 import SettingsButtonPopover from "../../@/components/compose/settings/SettingsButtonPopover";
 import { endProcessById, getRunningLocalhostProcesses } from "../../api";
@@ -10,6 +8,7 @@ import { useSettings } from "../setting";
 import ProcessInfoSheet from "../../@/components/compose/ProcessInfoSheet";
 import ProcessInfoButton from "../../@/components/compose/process-info/ProcessInfoButton";
 import ProcessTableRow from "../../@/components/compose/process-table-row/ProcessTableRow";
+import SearchInput from "../../@/components/compose/SearchInput";
 
 export type LocalProcess = {
   pid: string;
@@ -68,7 +67,7 @@ export default function Home() {
   return (
     <div className="h-full bg-main-background overflow-y-hidden text-main-foreground flex flex-col py-8">
       <div className="pl-6 pr-8 pb-4 flex gap-4 justify-between items-center border-component-border-color border-b-[1px]">
-        <Input
+        <SearchInput
           type="text"
           placeholder="Filter process"
           className="w-[200px]"
@@ -93,22 +92,22 @@ export default function Home() {
       <div className="h-full flex">
         <div className="relative h-full flex-1">
           {/* Header */}
-        <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center border-component-border-color border-b-[1px]">
-            <div className="w-[300px] max-w-[300px] mr-8 flex-1 border-r-[1px] border-component-border-color">
+          <div className="absolute top-0 left-0 right-0 px-10 py-2 flex items-center border-component-border-color border-b-[1px] font-bold">
+            <div className="w-[300px] max-w-[300px] mr-10 flex-1 border-r-[1px] border-component-border-color">
               Process Name
             </div>
             <div className="flex-1 ">Port</div>
             <div className="border-r-[1px] border-component-border-color"></div>
           </div>
           {/* List container */}
-          <div className="pt-[48px] pl-4 pr-8 overflow-y-auto h-[calc(100%-28px)]">
-            {localProcessList.length === 0 &&
-              !isFilterMode &&
-              "No localhost process running..."}
+          <div className="pt-[48px] pl-6 pr-8 overflow-y-auto h-[calc(100%-28px)]">
+            {localProcessList.length === 0 && !isFilterMode && (
+              <div className="px-4">No localhost process running...</div>
+            )}
 
             {isFilterMode &&
               filteredProcessList.length === 0 &&
-              "Search result not found "}
+              <div className="px-4">Search result not found</div>}
 
             {filteredProcessList.map((p, index) => (
               <ProcessTableRow

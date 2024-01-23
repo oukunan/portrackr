@@ -14,15 +14,15 @@ type Props = {
 export default function ProcessTableRow(props: Props) {
   return (
     <div
-      className={cn("px-6 py-2 flex items-center rounded-md border-[1px] border-transparent", {
+      className={cn("px-6 py-2 flex items-center rounded-md border-[1.5px] border-transparent", {
         "bg-main-background-2": props.isEvenChild,
-        "border-blue-600 bg-[#2f3a9b2c]": props.isInfoSelected,
+        "border-component-border-selected bg-component-background-selected": props.isInfoSelected,
       })}
     >
       <div className="w-[300px] max-w-[300px] truncate mr-8">
         {props.process.name}
       </div>
-      <div className="font-bold flex-1">{props.process.port}</div>
+      <div className="font-semibold flex-1">{props.process.port}</div>
       <div>
         <Tooltip>
           <TooltipTrigger asChild>

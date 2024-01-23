@@ -25,7 +25,7 @@ export default function ThemeToggleVisual(props: ThemeToggleVisualProps) {
           {
             "bg-slate-800 text-white": props.theme === "dark",
             "bg-slate-300": props.theme === "light" || props.theme === "system",
-            "border-blue-500": theme === props.theme
+            "border-component-border-selected": theme === props.theme
           }
         )}
       >
@@ -43,7 +43,7 @@ export default function ThemeToggleVisual(props: ThemeToggleVisualProps) {
         </div>
         {theme === props.theme && (
           <CheckIcon
-            className="bg-blue-500 absolute bottom-2 right-2 rounded-full p-1"
+            className="bg-component-border-selected absolute bottom-2 right-2 rounded-full p-1 text-white"
             width={20}
             height={20}
           />
