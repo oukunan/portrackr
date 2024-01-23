@@ -36,7 +36,10 @@ export default function TerminateProcessDialog(props: Props) {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription className="flex flex-col gap-4">
-            This action will end process with port number {port}
+            <div>
+              This action will end process with port number{" "}
+              <span className="font-bold">{port}</span>
+            </div>
             <div className="items-center flex space-x-2">
               <input
                 type="checkbox"
@@ -56,8 +59,11 @@ export default function TerminateProcessDialog(props: Props) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => handleEndProcess(pid)}>
-            Terminate
+          <AlertDialogAction
+            className="bg-[#cc3d42] hover:bg-[#dd4247] hover:dark:bg-[#b03539] text-white font-bold"
+            onClick={() => handleEndProcess(pid)}
+          >
+            Yes, terminate process
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
