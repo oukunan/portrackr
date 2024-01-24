@@ -6,7 +6,7 @@ export default function SearchInput(props: React.ComponentProps<typeof Input>) {
   return (
     <div className="relative">
       <Input {...props} className={cn("pl-9")} />
-      <MagnifyingGlassIcon className="absolute top-3 left-2.5" />
+      <MagnifyingGlassIcon className="absolute top-3 left-2.5 pointer-events-none" />
     </div>
   );
 }
