@@ -10,6 +10,10 @@
     "version": "0.0.0"
   },
   "tauri": {
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    },
     "allowlist": {
       "all": false,
       "shell": {
@@ -41,8 +45,8 @@
         "fullscreen": false,
         "resizable": true,
         "title": "",
-        "width": 1200,
-        "height": 750,
+        "minWidth": 1150,
+        "minHeight": 750,
         "titleBarStyle": "Overlay",
         "transparent": true
       }

@@ -1,7 +1,12 @@
 use serde::Serialize;
 use serde_json;
-use tauri::Manager;
 use std::process::{Command, Stdio};
+use std::thread;
+use std::time::Duration;
+use tauri::{
+    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+    SystemTraySubmenu,
+};
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 #[derive(Debug, Serialize)]
@@ -112,9 +117,86 @@ fn get_process_info_by_id(pid: u32) -> String {
     }
 }
 
+fn get_listening_processes_tray() -> Vec<ListeningProcess> {
+    let lsof_output = Command::new("lsof")
+        .arg("-P")
+        .arg("-i")
+        .arg("@localhost")
+        .stdout(Stdio::piped())
+        .stderr(Stdio::inherit())
+        .output()
+        .expect("Failed to run lsof command");
+
+    // Convert the output bytes to a string
+    let lsof_output_str = String::from_utf8_lossy(&lsof_output.stdout);
+
+    // Filter out lines containing 'LISTEN'
+    let filtered_lines: Vec<&str> = lsof_output_str
+        .lines()
+        .filter(|line| line.contains("LISTEN"))
+        .collect();
+
+    // Extract relevant information and create ListeningProcess objects
+    let listening_processes: Vec<ListeningProcess> = filtered_lines
+        .iter()
+        .map(|&line| {
+            let fields: Vec<&str> = line.split_whitespace().collect();
+            ListeningProcess {
+                name: fields[0].to_string(),
+                pid: fields[1].to_string(),
+                port: fields[8].to_string().replace("localhost:", ""),
+            }
+        })
+        .collect();
+
+    listening_processes
+}
+
+fn get_tray_menu() -> SystemTrayMenu {
+    let menus: Vec<SystemTraySubmenu> = get_listening_processes_tray()
+        .iter()
+        .map(|p| {
+            let parent_menu = SystemTrayMenu::new().add_item(CustomMenuItem::new(
+                p.pid.to_string(),
+                "End process".to_string(),
+            ));
+            SystemTraySubmenu::new(format!("{} - {}", p.port, p.name), parent_menu)
+        })
+        .collect();
+
+    let mut tray_menu = SystemTrayMenu::new();
+
+    for item in &menus {
+        tray_menu = tray_menu.add_submenu(item.clone());
+    }
+
+    tray_menu
+}
+
 fn main() {
+    let tray_menu = get_tray_menu()
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
+
+    let system_tray: SystemTray = SystemTray::new().with_menu(tray_menu);
+
     tauri::Builder::default()
         .setup(|app| {
+            let interval_duration = Duration::from_millis(1000);
+            let tray_handle = app.tray_handle();
+
+            thread::spawn(move || {
+                loop {
+                    let tray_menu = get_tray_menu()
+                        .add_native_item(SystemTrayMenuItem::Separator)
+                        .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
+
+                    let _ = tray_handle.set_menu(tray_menu);
+
+                    thread::sleep(interval_duration);
+                }
+            });
+
             let window = app.get_window("main").unwrap();
 
             #[cfg(target_os = "macos")]
@@ -127,6 +209,34 @@ fn main() {
             terminate_process_by_id,
             get_process_info_by_id
         ])
+        .system_tray(system_tray)
+        .on_system_tray_event(|app, event| match event {
+            SystemTrayEvent::MenuItemClick { id, .. } => {
+                let item_handle = app.tray_handle().get_item(&id);
+                match id.as_str() {
+                    "hide" => {
+                        let window = app.get_window("main").unwrap();
+                        window.hide().unwrap();
+                        // you can also `set_selected`, `set_enabled` and `set_native_image` (macOS only).
+                        item_handle.set_title("Show").unwrap();
+                    }
+                    _ => {
+                        let result: Result<u32, _> = id.parse();
+                        let parsed_id: u32 = match result {
+                            Ok(parsed_number) => parsed_number,
+                            Err(err) => {
+                                println!("Failed to parse: {}", err);
+                                // TODO: Looks weird to me 😂
+                                0
+                            }
+                        };
+
+                        let _ = terminate_process_by_id(parsed_id);
+                    }
+                }
+            }
+            _ => {}
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
