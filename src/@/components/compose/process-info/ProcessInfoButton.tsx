@@ -6,13 +6,13 @@ import React from "react";
 
 export default React.memo(function ProcessInfoButton(props: {
   active: boolean;
-  onClick: React.MouseEventHandler<HTMLButtonElement>
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
 }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <button
-          className={cn("p-1.5 rounded-md hover:bg-main-background-3", {
+          className={cn("hover:bg-main-background-3 rounded-md p-1.5", {
             "bg-main-background-3": props.active,
           })}
           onClick={props.onClick}

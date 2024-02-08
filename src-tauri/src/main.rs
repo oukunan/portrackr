@@ -181,20 +181,19 @@ fn main() {
     let system_tray: SystemTray = SystemTray::new().with_menu(tray_menu);
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::default().build())
         .setup(|app| {
             let interval_duration = Duration::from_millis(1000);
             let tray_handle = app.tray_handle();
 
-            thread::spawn(move || {
-                loop {
-                    let tray_menu = get_tray_menu()
-                        .add_native_item(SystemTrayMenuItem::Separator)
-                        .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
+            thread::spawn(move || loop {
+                let tray_menu = get_tray_menu()
+                    .add_native_item(SystemTrayMenuItem::Separator)
+                    .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
 
-                    let _ = tray_handle.set_menu(tray_menu);
+                let _ = tray_handle.set_menu(tray_menu);
 
-                    thread::sleep(interval_duration);
-                }
+                thread::sleep(interval_duration);
             });
 
             let window = app.get_window("main").unwrap();

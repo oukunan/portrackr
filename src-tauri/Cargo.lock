@@ -2085,6 +2085,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "portrackr"
+version = "0.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sysinfo",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-store",
+ "window-vibrancy",
+]
+
+[[package]]
 name = "powerfmt"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2149,18 +2162,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39278fbbf5fb4f646ce651690877f89d1c5811a3d4acb27700c1cb3cdb78fd3b"
 dependencies = [
  "unicode-ident",
-]
-
-[[package]]
-name = "processcontrol"
-version = "0.0.1"
-dependencies = [
- "serde",
- "serde_json",
- "sysinfo",
- "tauri",
- "tauri-build",
- "window-vibrancy",
 ]
 
 [[package]]
@@ -2935,6 +2936,18 @@ dependencies = [
  "syn 1.0.109",
  "tauri-codegen",
  "tauri-utils",
+]
+
+[[package]]
+name = "tauri-plugin-store"
+version = "0.0.0"
+source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v1#056a458d3025963874b113ff6cfe897373baf944"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+ "tauri",
+ "thiserror",
 ]
 
 [[package]]
