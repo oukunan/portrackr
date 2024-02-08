@@ -35,17 +35,7 @@ export default function FeedbackButtonPopover() {
       .then((response) => {
         if (response.code === 200) {
           alert("We received your submission, thank you!");
-        } else if (response.code === 422) {
-          // Field validation failed
-          // setError(response.message);
-        } else {
-          // other error from formcarry
-          // setError(response.message);
         }
-      })
-      .catch(() => {
-        // request related error.
-        // setError(error.message ? error.message : error);
       })
       .finally(() => {
         setIsDoneFeedback(true);
@@ -57,7 +47,7 @@ export default function FeedbackButtonPopover() {
     <div>
       <Popover>
         <PopoverTrigger asChild>
-          <Button className="py-1 px-2.5 h-auto border-[1px] border-[#292a38] bg-transparent text-[#84859e]">
+          <Button className="py-1 px-2.5 h-auto border-[1px]">
             Feedback
           </Button>
         </PopoverTrigger>
@@ -66,7 +56,7 @@ export default function FeedbackButtonPopover() {
             <span>Thank you for your feedback 🙏🏼</span>
           ) : (
             <form onSubmit={onSubmit}>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 mb-4">
                 <label htmlFor="message">Feedback</label>
                 <Textarea
                   id="message"
@@ -81,7 +71,7 @@ export default function FeedbackButtonPopover() {
               <Button
                 type="submit"
                 disabled={feedback.trim().length === 0}
-                className="bg-blue-500 hover:bg-blue-400 mt-2"
+                className="w-full"
               >
                 Send
               </Button>

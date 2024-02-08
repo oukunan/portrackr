@@ -1,4 +1,10 @@
-import { createContext, useCallback, useContext, useEffect } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { getLicenseKey, setLicenseKey } from "../../store";
 import { useNavigate } from "react-router-dom";
 
@@ -18,12 +24,15 @@ export function useLicenseKey() {
 }
 
 export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     console.log("Provider checking if license key is activated...");
     const call = async () => {
       await checkIfLicenseKeyIsActivated().then((response) => {
+        setLoading(false)
+
         if (response.error) {
           console.log(response.errorMessage);
           navigate("/");
@@ -137,6 +146,10 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
     checkIfLicenseKeyIsActivated,
     handleActivatedLicenseKey,
   };
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <LicenseKeyContext.Provider value={value}>

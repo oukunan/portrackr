@@ -18,7 +18,7 @@ export default function App() {
               <div className="flex h-full">
                 <div
                   data-tauri-drag-region
-                  className="fixed top-0 left-0 right-0 bg-transparent h-[30px]"
+                  className="fixed top-0 left-0 right-0 bg-transparent h-[30px] z-10"
                 />
                 <LeftPanel />
                 <div className="flex-1">
