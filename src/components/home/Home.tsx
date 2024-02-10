@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import TerminateProcessDialog from "../../@/components/compose/TerminateProcessDialog";
 import SettingsButtonPopover from "../../@/components/compose/settings/SettingsButtonPopover";
-import { endProcessById, getRunningLocalhostProcesses } from "../../api";
+import { endProcessById, getRunningLocalhostProcesses, startIntervalUpdateTrayMenu } from "../../api";
 import { useSettings } from "../setting";
 
 import ProcessInfoSheet from "../../@/components/compose/ProcessInfoSheet";
@@ -32,6 +32,12 @@ export default function Home() {
   } = useSettings();
 
   const [query, setQuery] = useState<string>("");
+
+
+  useEffect(() => {
+    startIntervalUpdateTrayMenu();
+  }, []);
+  
 
   useEffect(() => {
     setInterval(() => {
@@ -105,9 +111,9 @@ export default function Home() {
               <div className="px-4">No localhost process running...</div>
             )}
 
-            {isFilterMode &&
-              filteredProcessList.length === 0 &&
-              <div className="px-4">Search result not found</div>}
+            {isFilterMode && filteredProcessList.length === 0 && (
+              <div className="px-4">Search result not found</div>
+            )}
 
             {filteredProcessList.map((p, index) => (
               <ProcessTableRow

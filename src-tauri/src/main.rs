@@ -1,8 +1,7 @@
 use serde::Serialize;
 use serde_json;
+use std::env;
 use std::process::{Command, Stdio};
-use std::thread;
-use std::time::Duration;
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
     SystemTraySubmenu,
@@ -117,6 +116,17 @@ fn get_process_info_by_id(pid: u32) -> String {
     }
 }
 
+#[tauri::command]
+fn update_tray_menu_activated(app: tauri::AppHandle) {
+    let tray_handle = app.tray_handle();
+    let tray_menu = get_tray_menu(true)
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
+
+    let _ = tray_handle.set_menu(tray_menu);
+}
+// -------------------------------------------------------------------------
+
 fn get_listening_processes_tray() -> Vec<ListeningProcess> {
     let lsof_output = Command::new("lsof")
         .arg("-P")
@@ -152,50 +162,74 @@ fn get_listening_processes_tray() -> Vec<ListeningProcess> {
     listening_processes
 }
 
-fn get_tray_menu() -> SystemTrayMenu {
-    let menus: Vec<SystemTraySubmenu> = get_listening_processes_tray()
-        .iter()
-        .map(|p| {
-            let parent_menu = SystemTrayMenu::new().add_item(CustomMenuItem::new(
-                p.pid.to_string(),
-                "End process".to_string(),
-            ));
-            SystemTraySubmenu::new(format!("{} - {}", p.port, p.name), parent_menu)
-        })
-        .collect();
+fn get_tray_menu(license_key_activated: bool) -> SystemTrayMenu {
+    if !license_key_activated {
+        let empty_try = SystemTrayMenu::new();
+        empty_try
+    } else {
+        let menus: Vec<SystemTraySubmenu> = get_listening_processes_tray()
+            .iter()
+            .map(|p| {
+                let parent_menu = SystemTrayMenu::new().add_item(CustomMenuItem::new(
+                    p.pid.to_string(),
+                    "End process".to_string(),
+                ));
+                SystemTraySubmenu::new(format!("{} - {}", p.port, p.name), parent_menu)
+            })
+            .collect();
 
-    let mut tray_menu = SystemTrayMenu::new();
+        let mut tray_menu = SystemTrayMenu::new();
 
-    for item in &menus {
-        tray_menu = tray_menu.add_submenu(item.clone());
+        for item in &menus {
+            tray_menu = tray_menu.add_submenu(item.clone());
+        }
+
+        tray_menu
     }
-
-    tray_menu
 }
 
-fn main() {
-    let tray_menu = get_tray_menu()
+fn get_system_tray(is_license_activate: bool) -> SystemTray {
+    let tray_menu = get_tray_menu(is_license_activate)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
 
     let system_tray: SystemTray = SystemTray::new().with_menu(tray_menu);
+    system_tray
+}
 
+fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_store::Builder::default().build())
-        .setup(|app| {
-            let interval_duration = Duration::from_millis(1000);
-            let tray_handle = app.tray_handle();
+        .setup(move |app| {
+            // let stores = app.state::<StoreCollection<Wry>>();
+            // let path = PathBuf::from(".settings.dat");
 
-            thread::spawn(move || loop {
-                let tray_menu = get_tray_menu()
-                    .add_native_item(SystemTrayMenuItem::Separator)
-                    .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
+            // let _ = with_store(app.handle(), stores, path, |store| {
+            //     let license_key_option = store.get("portrackr-license-key");
+            //     license_key_activated = match license_key_option {
+            //         // TODO: Not sure why len equal to 2, actual value is "" 🧐
+            //         Some(value) => value.to_string().len() != 2,
+            //         None => false,
+            //     };
 
-                let _ = tray_handle.set_menu(tray_menu);
+            //     // HACK: Just return `Result`` type
+            //     store.insert("unused_val".to_string(), json!("unused_val"))
+            // });
 
-                thread::sleep(interval_duration);
-            });
+            // if license_key_activated {
+            //     let interval_duration = Duration::from_millis(1000);
+            //     let tray_handle = app.tray_handle();
 
+            //     thread::spawn(move || loop {
+            //         let tray_menu = get_tray_menu(license_key_activated)
+            //             .add_native_item(SystemTrayMenuItem::Separator)
+            //             .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
+
+            //         let _ = tray_handle.set_menu(tray_menu);
+
+            //         thread::sleep(interval_duration);
+            //     });
+            // }
             let window = app.get_window("main").unwrap();
 
             #[cfg(target_os = "macos")]
@@ -206,19 +240,13 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_listening_processes,
             terminate_process_by_id,
-            get_process_info_by_id
+            get_process_info_by_id,
+            update_tray_menu_activated,
         ])
-        .system_tray(system_tray)
-        .on_system_tray_event(|app, event| match event {
+        .system_tray(get_system_tray(false))
+        .on_system_tray_event(|_app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => {
-                let item_handle = app.tray_handle().get_item(&id);
                 match id.as_str() {
-                    "hide" => {
-                        let window = app.get_window("main").unwrap();
-                        window.hide().unwrap();
-                        // you can also `set_selected`, `set_enabled` and `set_native_image` (macOS only).
-                        item_handle.set_title("Show").unwrap();
-                    }
                     _ => {
                         let result: Result<u32, _> = id.parse();
                         let parsed_id: u32 = match result {

@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { getLicenseKey, setLicenseKey } from "../../store";
+import * as store from "../../store";
 import { useNavigate } from "react-router-dom";
 
 export interface LicenseKeyProviderProps {
@@ -28,25 +28,25 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Provider checking if license key is activated...");
-    const call = async () => {
+    const verifyLicense = async () => {
       await checkIfLicenseKeyIsActivated().then((response) => {
-        setLoading(false)
+        setLoading(false);
 
         if (response.error) {
-          console.log(response.errorMessage);
+          console.error(response.errorMessage);
           navigate("/");
         } else {
           navigate("/app");
         }
       });
     };
-    call();
+
+    verifyLicense();
   }, []);
 
   const checkIfLicenseKeyIsActivated = useCallback(async () => {
     try {
-      const key = await getLicenseKey();
+      const key = await store.getLicenseKey();
 
       if (!key) {
         return {
@@ -67,6 +67,7 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
       const response = await res.json();
 
       if (response.error) {
+        store.clearLicenseKey();
         return {
           error: true,
           success: false,
@@ -75,7 +76,7 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
       }
 
       if (response.valid && response.license_key.status !== "inactive") {
-        setLicenseKey(response.license_key.key);
+        store.setLicenseKey(response.license_key.key);
 
         return {
           error: false,
@@ -83,6 +84,7 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
           errorMessage: "",
         };
       } else {
+        store.clearLicenseKey();
         return {
           error: true,
           success: false,
@@ -91,6 +93,7 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
         };
       }
     } catch (e: any) {
+      store.clearLicenseKey();
       return {
         error: true,
         success: false,
@@ -116,7 +119,7 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
     const response = await res.json();
 
     if (response.error) {
-      setLicenseKey("");
+      store.setLicenseKey("");
 
       return {
         error: true,
@@ -125,15 +128,8 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
       };
     }
 
-    setLicenseKey(response.license_key.key);
-
-    if (response.activated) {
-      return {
-        error: false,
-        success: true,
-        errorMessage: "",
-      };
-    }
+    store.setLicenseKey(response.license_key.key);
+    console.log("✅ Set done....", response.license_key);
 
     return {
       error: false,
