@@ -117,13 +117,21 @@ fn get_process_info_by_id(pid: u32) -> String {
 }
 
 #[tauri::command]
-fn update_tray_menu_activated(app: tauri::AppHandle) {
-    let tray_handle = app.tray_handle();
-    let tray_menu = get_tray_menu(true)
+fn set_tray_menu_activated(app: tauri::AppHandle) {
+    let tray_menu = get_tray_menu()
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
 
-    let _ = tray_handle.set_menu(tray_menu);
+    let _ = app.tray_handle().set_menu(tray_menu);
+}
+
+#[tauri::command]
+fn set_tray_menu_deactivated(app: tauri::AppHandle) {
+    let tray_menu = build_tray()
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
+
+    let _ = app.tray_handle().set_menu(tray_menu);
 }
 // -------------------------------------------------------------------------
 
@@ -162,74 +170,38 @@ fn get_listening_processes_tray() -> Vec<ListeningProcess> {
     listening_processes
 }
 
-fn get_tray_menu(license_key_activated: bool) -> SystemTrayMenu {
-    if !license_key_activated {
-        let empty_try = SystemTrayMenu::new();
-        empty_try
-    } else {
-        let menus: Vec<SystemTraySubmenu> = get_listening_processes_tray()
-            .iter()
-            .map(|p| {
-                let parent_menu = SystemTrayMenu::new().add_item(CustomMenuItem::new(
-                    p.pid.to_string(),
-                    "End process".to_string(),
-                ));
-                SystemTraySubmenu::new(format!("{} - {}", p.port, p.name), parent_menu)
-            })
-            .collect();
+fn build_tray() -> SystemTrayMenu {
+    let parent_menu = SystemTrayMenu::new()
+        .add_item(CustomMenuItem::new("label".to_string(), "Listening Processes").disabled());
 
-        let mut tray_menu = SystemTrayMenu::new();
-
-        for item in &menus {
-            tray_menu = tray_menu.add_submenu(item.clone());
-        }
-
-        tray_menu
-    }
+    parent_menu
 }
 
-fn get_system_tray(is_license_activate: bool) -> SystemTray {
-    let tray_menu = get_tray_menu(is_license_activate)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
+fn get_tray_menu() -> SystemTrayMenu {
+    let menus: Vec<SystemTraySubmenu> = get_listening_processes_tray()
+        .iter()
+        .map(|p| {
+            let parent_menu = SystemTrayMenu::new().add_item(CustomMenuItem::new(
+                p.pid.to_string(),
+                "End process".to_string(),
+            ));
+            SystemTraySubmenu::new(format!("{} - {}", p.port, p.name), parent_menu)
+        })
+        .collect();
 
-    let system_tray: SystemTray = SystemTray::new().with_menu(tray_menu);
-    system_tray
+    let mut tray_menu = build_tray();
+
+    for item in &menus {
+        tray_menu = tray_menu.add_submenu(item.clone());
+    }
+
+    tray_menu
 }
 
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_store::Builder::default().build())
         .setup(move |app| {
-            // let stores = app.state::<StoreCollection<Wry>>();
-            // let path = PathBuf::from(".settings.dat");
-
-            // let _ = with_store(app.handle(), stores, path, |store| {
-            //     let license_key_option = store.get("portrackr-license-key");
-            //     license_key_activated = match license_key_option {
-            //         // TODO: Not sure why len equal to 2, actual value is "" 🧐
-            //         Some(value) => value.to_string().len() != 2,
-            //         None => false,
-            //     };
-
-            //     // HACK: Just return `Result`` type
-            //     store.insert("unused_val".to_string(), json!("unused_val"))
-            // });
-
-            // if license_key_activated {
-            //     let interval_duration = Duration::from_millis(1000);
-            //     let tray_handle = app.tray_handle();
-
-            //     thread::spawn(move || loop {
-            //         let tray_menu = get_tray_menu(license_key_activated)
-            //             .add_native_item(SystemTrayMenuItem::Separator)
-            //             .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
-
-            //         let _ = tray_handle.set_menu(tray_menu);
-
-            //         thread::sleep(interval_duration);
-            //     });
-            // }
             let window = app.get_window("main").unwrap();
 
             #[cfg(target_os = "macos")]
@@ -241,9 +213,10 @@ fn main() {
             get_listening_processes,
             terminate_process_by_id,
             get_process_info_by_id,
-            update_tray_menu_activated,
+            set_tray_menu_activated,
+            set_tray_menu_deactivated,
         ])
-        .system_tray(get_system_tray(false))
+        .system_tray(SystemTray::new())
         .on_system_tray_event(|_app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => {
                 match id.as_str() {

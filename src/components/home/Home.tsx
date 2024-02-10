@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import TerminateProcessDialog from "../../@/components/compose/TerminateProcessDialog";
 import SettingsButtonPopover from "../../@/components/compose/settings/SettingsButtonPopover";
-import { endProcessById, getRunningLocalhostProcesses, startIntervalUpdateTrayMenu } from "../../api";
+import {
+  endProcessById,
+  getRunningLocalhostProcesses,
+  setTrayMenuActivated,
+} from "../../api";
 import { useSettings } from "../setting";
 
 import ProcessInfoSheet from "../../@/components/compose/ProcessInfoSheet";
@@ -33,11 +37,15 @@ export default function Home() {
 
   const [query, setQuery] = useState<string>("");
 
-
   useEffect(() => {
-    startIntervalUpdateTrayMenu();
+    let id = setInterval(() => {
+      setTrayMenuActivated();
+    }, 1000);
+
+    return () => {
+      clearInterval(id)
+    }
   }, []);
-  
 
   useEffect(() => {
     setInterval(() => {

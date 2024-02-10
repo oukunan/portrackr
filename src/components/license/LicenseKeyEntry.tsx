@@ -1,18 +1,24 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLicenseKey } from "./LicenseKeyProvider";
 import { Button } from "../../@/components/ui/button";
 import { Input } from "../../@/components/ui/input";
 import Loading from "../../@/components/ui/loading";
 import ReadyToUseAppDialog from "../../@/components/compose/ReadyToUseAppDialog";
+import { setTrayMenuDeactivated } from "../../api";
 
 export default function LicenseKeyEntry() {
   const [errorMessage, setErrorMessage] = useState("");
-  const [readyToUseAppDialogVisible, setReadyToUseAppDialogVisible] = useState(false);
+  const [readyToUseAppDialogVisible, setReadyToUseAppDialogVisible] =
+    useState(false);
   const [loading, setLoading] = useState(false);
   const errorMessageLabel = useRef<HTMLLabelElement>(null);
   const licenseKeyRef = useRef<HTMLInputElement>(null);
 
   const { handleActivatedLicenseKey } = useLicenseKey();
+
+  useEffect(() => {
+    setTrayMenuDeactivated();
+  }, []);
 
   const handleActivateLicenseKey = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>

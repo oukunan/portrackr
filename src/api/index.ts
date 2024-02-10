@@ -16,9 +16,11 @@ export async function getProcessInfoById(pid: string): Promise<string> {
   });
 }
 
-// TODO: Handle if key not activate.
-export async function startIntervalUpdateTrayMenu() {
-  setInterval(() => {
-    invoke("update_tray_menu_activated");
-  }, 1000);
+export async function setTrayMenuActivated() {
+  return invoke("set_tray_menu_activated");
+}
+
+
+export async function setTrayMenuDeactivated() {
+  return invoke("set_tray_menu_deactivated");
 }
