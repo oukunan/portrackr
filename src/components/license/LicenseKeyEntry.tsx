@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { getVersion } from '@tauri-apps/api/app';
+
 import { useLicenseKey } from "./LicenseKeyProvider";
 import { Button } from "../../@/components/ui/button";
 import { Input } from "../../@/components/ui/input";
@@ -7,6 +9,7 @@ import ReadyToUseAppDialog from "../../@/components/compose/ReadyToUseAppDialog"
 import { setTrayMenuDeactivated } from "../../api";
 
 export default function LicenseKeyEntry() {
+  const [appVersion, setAppVersion] = useState('')
   const [errorMessage, setErrorMessage] = useState("");
   const [readyToUseAppDialogVisible, setReadyToUseAppDialogVisible] =
     useState(false);
@@ -18,6 +21,11 @@ export default function LicenseKeyEntry() {
 
   useEffect(() => {
     setTrayMenuDeactivated();
+   
+    getVersion().then((result) => {
+      setAppVersion(result)
+      return
+    })
   }, []);
 
   const handleActivateLicenseKey = async (
@@ -58,6 +66,7 @@ export default function LicenseKeyEntry() {
 
   return (
     <div className="relative h-full text-main-foreground bg-main-background-2 flex justify-center items-center p-10">
+      <div className="font-bold absolute bottom-2 left-4">v{appVersion}</div>
       <div className="w-[500px] relative">
         <h1 className="text-7xl font-bold">Portrackr</h1>
         <div className="mt-10">
@@ -88,7 +97,7 @@ export default function LicenseKeyEntry() {
             {errorMessage}
           </span>
         )}
-        <div className="flex gap-8 justify-center">
+        <div className="flex gap-8 justify-center mt-4">
           <Button
             className="btn btn-primary"
             onClick={handleActivateLicenseKey}
