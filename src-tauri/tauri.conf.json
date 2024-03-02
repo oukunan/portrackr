@@ -46,7 +46,7 @@
 			"icon": [
 				"icons/32x32.png",
 				"icons/128x128.png",
-				"icons/128x128@2x.png",
+        "icons/128x128@2x.png",
 				"icons/icon.icns",
 				"icons/icon.ico"
 			],
@@ -61,7 +61,7 @@
       "active": true,
       "dialog": true,
       "endpoints": [
-        "https://gist.githubusercontent.com/futurouz/8475f3c268f85ec7f735b8c4b723b48b/raw/"
+        "https://gist.githubusercontent.com/futurouz/fa7b7603ac5c2d7160f6d8f7c68c072e/raw"
       ],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDNzgzODJFNDI3NkUwRTUKUldUbDRIWkNMamg0ZkV0dXZNSUI1ZTM4MmNobEZ5VGd6c0hDZnZhKzUwT3BMcHlMRFIvcHNINHgK"
     }
