@@ -24,9 +24,8 @@ export default function TerminateProcessDialog(props: Props) {
   const handleEndProcess = async (pid: string) => {
     try {
       await endProcessById(pid);
-      console.log("Success");
     } catch (err) {
-      console.log("e: ", err);
+      console.error("e: ", err);
     }
   };
 

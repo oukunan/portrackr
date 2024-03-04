@@ -7,7 +7,7 @@ import {
 } from "react";
 import * as store from "../../store";
 import { useNavigate } from "react-router-dom";
-
+import * as LM from "@lemonsqueezy/lemonsqueezy.js";
 export interface LicenseKeyProviderProps {
   children: React.ReactNode;
 }
@@ -29,6 +29,9 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
 
   useEffect(() => {
     const verifyLicense = async () => {
+      LM.lemonSqueezySetup({
+        apiKey: import.meta.env.VITE_LEMONSQUEEZY_API_KEY,
+      });
       await checkIfLicenseKeyIsActivated().then((response) => {
         setLoading(false);
 
@@ -56,27 +59,22 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
         };
       }
 
-      const res = await fetch(import.meta.env.VITE_LEMON_SQUEEZY_VALIDATE_URL, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ license_key: key }),
-      });
-      const response = await res.json();
+      const response = await LM.validateLicense(key);
 
       if (response.error) {
         store.clearLicenseKey();
         return {
           error: true,
           success: false,
-          errorMessage: response.error,
+          errorMessage: response.data?.error,
         };
       }
 
-      if (response.valid && response.license_key.status !== "inactive") {
-        store.setLicenseKey(response.license_key.key);
+      if (
+        response.data?.valid &&
+        response.data.license_key.status !== "inactive"
+      ) {
+        store.setLicenseKey(response.data?.license_key.key);
 
         return {
           error: false,
@@ -107,16 +105,7 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
       throw new Error("Please enter a valid license key");
     }
 
-    const res = await fetch(import.meta.env.VITE_LEMON_SQUEEZY_ACTIVATE_URL, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ license_key: key, instance_name: "portrackr" }),
-    });
-
-    const response = await res.json();
+    const response = await LM.activateLicense(key, "portrackr");
 
     if (response.error) {
       store.setLicenseKey("");
@@ -124,12 +113,13 @@ export const LicenseKeyProvider = (props: LicenseKeyProviderProps) => {
       return {
         error: true,
         success: false,
-        errorMessage: response.error,
+        errorMessage: response.data?.error,
       };
     }
 
-    store.setLicenseKey(response.license_key.key);
-    console.log("✅ Set done....", response.license_key);
+    if (response.data) {
+      store.setLicenseKey(response.data.license_key.key);
+    }
 
     return {
       error: false,

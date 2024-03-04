@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { getVersion } from '@tauri-apps/api/app';
+import { getVersion } from "@tauri-apps/api/app";
+import LogoUrl from '../../assets/logo.png'
+
 
 import { useLicenseKey } from "./LicenseKeyProvider";
 import { Button } from "../../@/components/ui/button";
@@ -9,7 +11,7 @@ import ReadyToUseAppDialog from "../../@/components/compose/ReadyToUseAppDialog"
 import { setTrayMenuDeactivated } from "../../api";
 
 export default function LicenseKeyEntry() {
-  const [appVersion, setAppVersion] = useState('')
+  const [appVersion, setAppVersion] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [readyToUseAppDialogVisible, setReadyToUseAppDialogVisible] =
     useState(false);
@@ -21,11 +23,11 @@ export default function LicenseKeyEntry() {
 
   useEffect(() => {
     setTrayMenuDeactivated();
-   
+
     getVersion().then((result) => {
-      setAppVersion(result)
-      return
-    })
+      setAppVersion(result);
+      return;
+    });
   }, []);
 
   const handleActivateLicenseKey = async (
@@ -68,7 +70,10 @@ export default function LicenseKeyEntry() {
     <div className="relative h-full text-main-foreground bg-main-background-2 flex justify-center items-center p-10">
       <div className="font-bold absolute bottom-2 left-4">v{appVersion}</div>
       <div className="w-[500px] relative">
-        <h1 className="text-7xl font-bold">Portrackr</h1>
+        <div className="flex gap-3 items-center">
+          <img src={LogoUrl} className="h-[90px] w-[90px]" />
+          <h1 className="text-7xl font-bold">Portrackr</h1>
+        </div>
         <div className="mt-10">
           <label htmlFor="licenseKeyInput">
             <span className="text-base label-text">
@@ -91,6 +96,7 @@ export default function LicenseKeyEntry() {
               </div>
             )}
           </div>
+          .
         </div>
         {errorMessage && (
           <span ref={errorMessageLabel} className="text-xs my-4 block">
