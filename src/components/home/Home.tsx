@@ -43,14 +43,15 @@ export default function Home() {
     }, 1000);
 
     return () => {
-      clearInterval(id)
-    }
+      clearInterval(id);
+    };
   }, []);
 
   useEffect(() => {
     setInterval(() => {
       getRunningLocalhostProcesses().then((serializedData: string) => {
         const result = JSON.parse(serializedData);
+        console.log("serializedData: ", serializedData);
         setLocalProcessList(result);
       });
     }, 1000);
@@ -126,6 +127,7 @@ export default function Home() {
             {filteredProcessList.map((p, index) => (
               <ProcessTableRow
                 key={index}
+                query={query}
                 process={p}
                 onInfoButtonClick={(pid: string) => {
                   if (processInfoId === p.pid) {

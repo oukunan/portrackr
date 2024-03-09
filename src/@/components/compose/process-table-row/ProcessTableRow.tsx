@@ -2,11 +2,13 @@ import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import { cn } from "../../../lib/utils";
 import { LocalProcess } from "../../../../components/home/Home";
+import Highlighter from "react-highlight-words";
 
 type Props = {
   process: LocalProcess;
   onInfoButtonClick: (pid: string) => void;
   onEnterProcessButtonClick: (pid: string) => void;
+  query: string;
   isInfoSelected?: boolean;
   isEvenChild: boolean;
 };
@@ -14,15 +16,24 @@ type Props = {
 export default function ProcessTableRow(props: Props) {
   return (
     <div
-      className={cn("px-6 py-2 flex items-center rounded-md border-[1.5px] border-transparent", {
-        "bg-main-background-2": props.isEvenChild,
-        "border-component-border-selected bg-component-background-selected": props.isInfoSelected,
-      })}
+      className={cn(
+        "px-6 py-2 flex items-center rounded-md border-[1.5px] border-transparent",
+        {
+          "bg-main-background-2": props.isEvenChild,
+          "border-component-border-selected bg-component-background-selected":
+            props.isInfoSelected,
+        }
+      )}
     >
       <div className="w-[300px] max-w-[300px] truncate mr-8">
         {props.process.name}
       </div>
-      <div className="font-semibold flex-1">{props.process.port}</div>
+      <div className="font-semibold flex-1">
+        <Highlighter
+          searchWords={[props.query]}
+          textToHighlight={props.process.port}
+        />
+      </div>
       <div>
         <Tooltip>
           <TooltipTrigger asChild>
