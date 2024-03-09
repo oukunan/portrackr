@@ -80,13 +80,12 @@ export default function LicenseKeyEntry() {
               Please enter your license key
             </span>
           </label>
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center mt-4">
             <Input
               ref={licenseKeyRef}
               type="text"
               id="licenseKeyInput"
               placeholder="License key"
-              className="mt-4"
               autoFocus
               disabled={loading}
             />
@@ -96,7 +95,6 @@ export default function LicenseKeyEntry() {
               </div>
             )}
           </div>
-          .
         </div>
         {errorMessage && (
           <span ref={errorMessageLabel} className="text-xs my-4 block">
