@@ -8,7 +8,7 @@ use tauri::{
 };
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 struct ListeningProcess {
     pid: String,
     name: String,
@@ -58,9 +58,13 @@ fn get_listening_processes() -> String {
         })
         .collect();
 
+    let mut unique_listening_processes = listening_processes.clone();
+    unique_listening_processes.sort_by(|a, b| a.pid.cmp(&b.pid).then_with(|| a.name.cmp(&b.name)));
+    unique_listening_processes.dedup_by(|a, b| a.pid == b.pid && a.name == b.name);
+
     // Serialize the vector to a JSON string
     let json_output =
-        serde_json::to_string(&listening_processes).expect("Failed to serialize data");
+        serde_json::to_string(&unique_listening_processes).expect("Failed to serialize data");
 
     json_output
 }
@@ -167,7 +171,11 @@ fn get_listening_processes_tray() -> Vec<ListeningProcess> {
         })
         .collect();
 
-    listening_processes
+    let mut unique_listening_processes = listening_processes.clone();
+    unique_listening_processes.sort_by(|a, b| a.pid.cmp(&b.pid).then_with(|| a.name.cmp(&b.name)));
+    unique_listening_processes.dedup_by(|a, b| a.pid == b.pid && a.name == b.name);
+
+    unique_listening_processes
 }
 
 fn build_tray() -> SystemTrayMenu {
@@ -185,7 +193,7 @@ fn get_tray_menu() -> SystemTrayMenu {
                 p.pid.to_string(),
                 "End process".to_string(),
             ));
-            SystemTraySubmenu::new(format!("{} - {}", p.port, p.name), parent_menu)
+            SystemTraySubmenu::new(format!("{} · {}", p.port, p.name), parent_menu)
         })
         .collect();
 
