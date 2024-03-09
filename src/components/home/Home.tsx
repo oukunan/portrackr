@@ -56,7 +56,7 @@ export default function Home() {
     }, 1000);
   }, []);
 
-  const isFilterMode = query.length > 1;
+  const isFilterMode = query.length > 0;
 
   const filteredProcessList = useMemo(() => {
     const trimmedQuery = query.trim();
