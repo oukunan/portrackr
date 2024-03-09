@@ -7,17 +7,17 @@
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
 
-    --left-panel-background: #fcfcfcca;
+    --left-panel-background: #f2f2f2d1;
 
-    --component-background: #ebebeb;
+    --component-background: #fdfdfd;
     --component-foreground: #0d0d0ddf;
     --component-border-color: #dbdbdb;
     --component-border-selected: #3b82f6;
     --component-background-selected: #3b83f621;
 
-    --main-background: #e4e2e2;
-    --main-background-2: #d3d2d2;
-    --main-background-3: #cccaca;
+    --main-background: #fcfcfc;
+    --main-background-2: #ebebeb;
+    --main-background-3: #dbdbdb;
 
     --main-foreground: #1C1D26;
 
@@ -53,7 +53,7 @@
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
 
-    --left-panel-background: #0b0c10d7;
+    --left-panel-background: #161719d7;
 
     --component-background: #252532;
     --component-foreground: #dbd9d9;
@@ -105,6 +105,7 @@
     overflow: hidden;
   }
 }
+
 
 ::-webkit-scrollbar {
   width: 7px;
