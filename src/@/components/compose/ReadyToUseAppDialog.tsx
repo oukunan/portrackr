@@ -16,7 +16,7 @@ export default function ReadyToUseAppDialog(props: { open: boolean }) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Congratulation</AlertDialogTitle>
-          <AlertDialogDescription className="flex flex-col gap-4">
+          <AlertDialogDescription className="flex flex-col gap-4" asChild>
             <div>
               You license key activated successfully
             </div>
