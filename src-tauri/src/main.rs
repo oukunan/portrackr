@@ -25,12 +25,12 @@ struct ProcessInfo {
     time: String,
 }
 
-#[tauri::command]
-fn get_listening_processes() -> String {
+fn reuse_get_local_processes() -> Vec<ListeningProcess> {
     let lsof_output = Command::new("lsof")
-        .arg("-P")
         .arg("-i")
-        .arg("@localhost")
+        .arg("TCP")
+        .arg("-sTCP:LISTEN")
+        .arg("-P")
         .stdout(Stdio::piped())
         .stderr(Stdio::inherit())
         .output()
@@ -42,7 +42,9 @@ fn get_listening_processes() -> String {
     // Filter out lines containing 'LISTEN'
     let filtered_lines: Vec<&str> = lsof_output_str
         .lines()
-        .filter(|line| line.contains("LISTEN"))
+        .filter(|line| {
+            !line.contains("ControlCe") & !line.contains("rapportd") & &!line.contains("COMMAND")
+        })
         .collect();
 
     // Extract relevant information and create ListeningProcess objects
@@ -53,7 +55,10 @@ fn get_listening_processes() -> String {
             ListeningProcess {
                 name: fields[0].to_string(),
                 pid: fields[1].to_string(),
-                port: fields[8].to_string().replace("localhost:", ""),
+                port: fields[8]
+                    .to_string()
+                    .replace("localhost:", "")
+                    .replace("*:", ""),
             }
         })
         .collect();
@@ -62,6 +67,12 @@ fn get_listening_processes() -> String {
     unique_listening_processes.sort_by(|a, b| a.pid.cmp(&b.pid).then_with(|| a.name.cmp(&b.name)));
     unique_listening_processes.dedup_by(|a, b| a.pid == b.pid && a.name == b.name);
 
+    unique_listening_processes
+}
+
+#[tauri::command]
+fn get_listening_processes() -> String {
+    let unique_listening_processes = reuse_get_local_processes();
     // Serialize the vector to a JSON string
     let json_output =
         serde_json::to_string(&unique_listening_processes).expect("Failed to serialize data");
@@ -140,41 +151,7 @@ fn set_tray_menu_deactivated(app: tauri::AppHandle) {
 // -------------------------------------------------------------------------
 
 fn get_listening_processes_tray() -> Vec<ListeningProcess> {
-    let lsof_output = Command::new("lsof")
-        .arg("-P")
-        .arg("-i")
-        .arg("@localhost")
-        .stdout(Stdio::piped())
-        .stderr(Stdio::inherit())
-        .output()
-        .expect("Failed to run lsof command");
-
-    // Convert the output bytes to a string
-    let lsof_output_str = String::from_utf8_lossy(&lsof_output.stdout);
-
-    // Filter out lines containing 'LISTEN'
-    let filtered_lines: Vec<&str> = lsof_output_str
-        .lines()
-        .filter(|line| line.contains("LISTEN"))
-        .collect();
-
-    // Extract relevant information and create ListeningProcess objects
-    let listening_processes: Vec<ListeningProcess> = filtered_lines
-        .iter()
-        .map(|&line| {
-            let fields: Vec<&str> = line.split_whitespace().collect();
-            ListeningProcess {
-                name: fields[0].to_string(),
-                pid: fields[1].to_string(),
-                port: fields[8].to_string().replace("localhost:", ""),
-            }
-        })
-        .collect();
-
-    let mut unique_listening_processes = listening_processes.clone();
-    unique_listening_processes.sort_by(|a, b| a.pid.cmp(&b.pid).then_with(|| a.name.cmp(&b.name)));
-    unique_listening_processes.dedup_by(|a, b| a.pid == b.pid && a.name == b.name);
-
+    let unique_listening_processes = reuse_get_local_processes();
     unique_listening_processes
 }
 
