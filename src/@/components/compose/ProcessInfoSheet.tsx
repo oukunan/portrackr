@@ -45,14 +45,14 @@ export default React.memo(function ProcessInfoSheet(props: Props) {
 
   const value = useMemo(
     () => ({
-      PID: props.pId,
-      Name: props.pName,
-      Port: props.pPort,
+      "Process ID": props.pId,
+      "Name": props.pName,
+      "Port": props.pPort,
       // "Effective Group ID": processInfo?.gid,
       "Start Time": processInfo?.stime,
       "CPU time": processInfo?.time,
-      "Ratio of CPU time used to CPU time": processInfo?.pcpu,
-      "Amount of (virtual) memory": `${processInfo?.vsz} kilobytes`,
+      // "Ratio of CPU time used to CPU time": processInfo?.pcpu,
+      // "Amount of (virtual) memory": `${processInfo?.vsz} kilobytes`,
       Command: processInfo?.comm,
     }),
     [props.pName, props.pId, props.pPort, processInfo]
