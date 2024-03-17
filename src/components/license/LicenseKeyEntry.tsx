@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
-import LogoUrl from '../../assets/logo.png'
-
+import LogoUrl from "../../assets/logo.png";
 
 import { useLicenseKey } from "./LicenseKeyProvider";
 import { Button } from "../../@/components/ui/button";
@@ -68,7 +67,15 @@ export default function LicenseKeyEntry() {
 
   return (
     <div className="relative h-full text-main-foreground bg-main-background-2 flex justify-center items-center p-10">
-      <div className="font-bold absolute bottom-2 left-4">v{appVersion}</div>
+      <div className="font-bold absolute bottom-2 left-4 text-xs">
+        v{appVersion}
+      </div>
+      <div className="font-bold absolute bottom-2 right-4 text-xs">
+        Get your license at{" "}
+        <a href="https://portrackr.com" target="_blank">
+          https://portrackr.com
+        </a>
+      </div>
       <div className="w-[500px] relative">
         <div className="flex gap-3 items-center">
           <img src={LogoUrl} className="h-[90px] w-[90px]" />
@@ -110,7 +117,6 @@ export default function LicenseKeyEntry() {
             Activate license
           </Button>
         </div>
-
         <ReadyToUseAppDialog open={readyToUseAppDialogVisible} />
       </div>
     </div>
