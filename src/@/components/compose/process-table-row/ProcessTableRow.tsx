@@ -28,12 +28,24 @@ export default function ProcessTableRow(props: Props) {
       <div className="w-[300px] max-w-[300px] truncate mr-8">
         {props.process.name}
       </div>
-      <div className="font-semibold flex-1">
-        <Highlighter
-          searchWords={[props.query]}
-          textToHighlight={props.process.port}
-        />
+      <div className="flex-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <a
+              className="font-semibold"
+              href={`http://localhost:${props.process.port}`}
+              target="_blank"
+            >
+              <Highlighter
+                searchWords={[props.query]}
+                textToHighlight={props.process.port}
+              />
+            </a>
+          </TooltipTrigger>
+          <TooltipContent>Open in Browser</TooltipContent>
+        </Tooltip>
       </div>
+
       <div>
         <Tooltip>
           <TooltipTrigger asChild>

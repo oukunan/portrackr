@@ -33,10 +33,11 @@
         "fullscreen": false,
         "resizable": true,
         "title": "",
-        "minWidth": 1150,
-        "minHeight": 750,
+        "minWidth": 1100,
+        "minHeight": 700,
         "titleBarStyle": "Overlay",
-        "transparent": true
+        "transparent": true,
+        "center": true
       }
     ],
     "bundle": {

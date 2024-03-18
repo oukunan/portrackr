@@ -6,6 +6,7 @@ use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
     SystemTraySubmenu,
 };
+use webbrowser;
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 #[derive(Debug, Serialize, Clone)]
@@ -166,10 +167,15 @@ fn get_tray_menu() -> SystemTrayMenu {
     let menus: Vec<SystemTraySubmenu> = get_listening_processes_tray()
         .iter()
         .map(|p| {
-            let parent_menu = SystemTrayMenu::new().add_item(CustomMenuItem::new(
-                p.pid.to_string(),
-                "End process".to_string(),
-            ));
+            let parent_menu = SystemTrayMenu::new()
+                .add_item(CustomMenuItem::new(
+                    format!("end_process#{}", p.pid.to_string()),
+                    format!("End Process (id: {})",  p.pid.to_string()),
+                ))
+                .add_item(CustomMenuItem::new(
+                    format!("open_in_browser#{}", p.port.to_string()),
+                    "Open in Browser",
+                ));
             SystemTraySubmenu::new(format!("{} · {}", p.port, p.name), parent_menu)
         })
         .collect();
@@ -204,9 +210,14 @@ fn main() {
         .system_tray(SystemTray::new())
         .on_system_tray_event(|_app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => {
-                match id.as_str() {
-                    _ => {
-                        let result: Result<u32, _> = id.parse();
+                let parts: Vec<&str> = id.split('#').collect();
+
+                let click_action = parts[0];
+                let id_or_port = parts[1];
+
+                match click_action {
+                    "end_process" => {
+                        let result: Result<u32, _> = id_or_port.parse();
                         let parsed_id: u32 = match result {
                             Ok(parsed_number) => parsed_number,
                             Err(err) => {
@@ -217,6 +228,14 @@ fn main() {
                         };
 
                         let _ = terminate_process_by_id(parsed_id);
+                    }
+
+                    "open_in_browser" => {
+                        let url = format!("http://localhost:{}", id_or_port);
+                        let _ = webbrowser::open(url.as_str());
+                    }
+                    _ => {
+                        println!("Do nothing...")
                     }
                 }
             }
